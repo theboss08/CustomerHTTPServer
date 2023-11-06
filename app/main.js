@@ -8,12 +8,23 @@ const server = net.createServer((socket) => {
   });
   socket.on("data", (data) => {
     let firstLine = data.toString().split('\r\n')[0];
-    let str = firstLine.split(' ')[1].match(/\/echo\/(.*)/);
-    if(str && str[1] != '') {
-        socket.write(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${str[1].length}\r\n\r\n${str[1]}`);
+    let headerMap = new Map();
+    data.toString().split('\r\n').forEach(line => {
+        if (line.split(' ')[0][line.split(' ')[0].length - 1] === ':') {
+            headerMap.set(line.split(' ')[0], line.split(' ').slice(1).join(''));
+        }
+    });
+    console.log(headerMap);
+    let path = firstLine.split(' ')[1];
+    if(path.match(/\/echo\/(.*)/) && path.match(/\/echo\/(.*)/)[1] != '') {
+        socket.write(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${path[1].length}\r\n\r\n${path[1]}`);
     }
-    else if (firstLine.split(' ')[1].length === 1 && firstLine.split(' ')[1] === '/') {
+    else if (path.length === 1 && path === '/') {
         socket.write('HTTP/1.1 200 OK\r\n\r\n');
+    }
+    else if (path === '/user-agent') {
+        let response = headerMap.get('User-Agent:');
+        socket.write(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${response.length}\r\n\r\n${response}`);
     }
     else {
         socket.write('HTTP/1.1 404 Not Found\r\n\r\n');
