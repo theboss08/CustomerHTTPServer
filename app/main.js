@@ -14,4 +14,4 @@ const server = net.createServer((socket) => {
   })
 });
 
-server.listen(4221, "127.0.0.1");
+server.listen(4221, "localhost");
