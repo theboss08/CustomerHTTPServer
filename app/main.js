@@ -14,10 +14,10 @@ const server = net.createServer((socket) => {
             headerMap.set(line.split(' ')[0], line.split(' ').slice(1).join(''));
         }
     });
-    console.log(headerMap);
     let path = firstLine.split(' ')[1];
     if(path.match(/\/echo\/(.*)/) && path.match(/\/echo\/(.*)/)[1] != '') {
-        socket.write(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${path[1].length}\r\n\r\n${path[1]}`);
+        let response = path.match(/\/echo\/(.*)/)[1];
+        socket.write(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${response.length}\r\n\r\n${response}`);
     }
     else if (path.length === 1 && path === '/') {
         socket.write('HTTP/1.1 200 OK\r\n\r\n');
