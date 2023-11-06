@@ -5,8 +5,6 @@ const directory = args[0] === '--directory' ? args[1] : __dirname;
 
 // Uncomment this to pass the first stage
 const server = net.createServer((socket) => {
-    console.log("client connected");
-
     socket.on("close", () => {
         socket.end();
         server.close();
@@ -35,12 +33,8 @@ const server = net.createServer((socket) => {
         else if (path.match(/\/files\/(.*)/) && path.match(/\/files\/(.*)/)[1] != '') {
             let filePath = directory + path.match(/\/files\/(.*)/)[1];
             console.log(filePath);
-            try {
-                const file = fs.readFileSync(filePath);
-                socket.write(`HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: ${file.length}\r\n\r\n${file}`);
-            } catch (err){
-                socket.write('HTTP/1.1 404 Not Found\r\n\r\n');
-            }
+            const file = fs.readFileSync(filePath);
+            socket.write(`HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: ${file.length}\r\n\r\n${file}`);
         }
         else {
             socket.write('HTTP/1.1 404 Not Found\r\n\r\n');
