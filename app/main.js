@@ -1,4 +1,5 @@
 const net = require("net");
+const fs = require("fs")
 
 const args = process.argv.slice(2);
 const directory = args[0] === '--directory' ? args[1] : __dirname;
