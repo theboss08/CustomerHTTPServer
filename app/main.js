@@ -19,31 +19,43 @@ const server = net.createServer((socket) => {
                 headerMap.set(line.split(' ')[0], line.split(' ').slice(1).join(''));
             }
         });
-        let path = firstLine.split(' ')[1];
-        if(path.match(/\/echo\/(.*)/) && path.match(/\/echo\/(.*)/)[1] != '') {
-            let response = path.match(/\/echo\/(.*)/)[1];
-            socket.write(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${response.length}\r\n\r\n${response}`);
-        }
-        else if (path.length === 1 && path === '/') {
-            socket.write('HTTP/1.1 200 OK\r\n\r\n');
-        }
-        else if (path === '/user-agent') {
-            let response = headerMap.get('User-Agent:');
-            socket.write(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${response.length}\r\n\r\n${response}`);
-        }
-        else if (path.match(/\/files\/(.*)/) && path.match(/\/files\/(.*)/)[1] != '') {
-            let filePath = directory + path.match(/\/files\/(.*)/)[1];
-            console.log(filePath);
-            try {
-                const file = fs.readFileSync(filePath);
-                socket.write(`HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: ${file.length}\r\n\r\n${file}`);
-            } catch (err) {
-                console.log(err);
+        if (firstLine.split(' ')[0] === 'GET') {
+            let path = firstLine.split(' ')[1];
+            if(path.match(/\/echo\/(.*)/) && path.match(/\/echo\/(.*)/)[1] != '') {
+                let response = path.match(/\/echo\/(.*)/)[1];
+                socket.write(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${response.length}\r\n\r\n${response}`);
+            }
+            else if (path.length === 1 && path === '/') {
+                socket.write('HTTP/1.1 200 OK\r\n\r\n');
+            }
+            else if (path === '/user-agent') {
+                let response = headerMap.get('User-Agent:');
+                socket.write(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${response.length}\r\n\r\n${response}`);
+            }
+            else if (path.match(/\/files\/(.*)/) && path.match(/\/files\/(.*)/)[1] != '') {
+                let filePath = directory + path.match(/\/files\/(.*)/)[1];
+                console.log(filePath);
+                try {
+                    const file = fs.readFileSync(filePath);
+                    socket.write(`HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: ${file.length}\r\n\r\n${file}`);
+                } catch (err) {
+                    console.log(err);
+                    socket.write('HTTP/1.1 404 Not Found\r\n\r\n');
+                }
+            }
+            else {
                 socket.write('HTTP/1.1 404 Not Found\r\n\r\n');
             }
         }
-        else {
-            socket.write('HTTP/1.1 404 Not Found\r\n\r\n');
+        else if (firstLine.split(' ')[0] === 'POST') {
+            let path = firstLine.split(' ')[1];
+            if (path.match(/\/files\/(.*)/) && path.match(/\/files\/(.*)/)[1] != '') {
+                let filePath = directory + path.match(/\/files\/(.*)/)[1];
+                console.log(filePath);
+                let file = data.toString().split('\r\n\r\n').slice(1).join('');
+                console.log(file.toString())
+                fs.writeFileSync(filePath, file);
+            }
         }
         socket.end();
     })
