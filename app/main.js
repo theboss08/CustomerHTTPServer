@@ -48,6 +48,7 @@ const server = net.createServer((socket) => {
         else if (firstLine.split(' ')[0] === 'POST') {
             let path = firstLine.split(' ')[1];
             if (path.match(/\/files\/(.*)/) && path.match(/\/files\/(.*)/)[1] != '') {
+                console.log("inside post")
                 let filePath = directory + path.match(/\/files\/(.*)/)[1];
                 console.log(filePath);
                 let file = data.toString().split('\r\n\r\n').slice(1).join('');
