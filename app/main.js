@@ -33,7 +33,7 @@ const server = net.createServer((socket) => {
             socket.write(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${response.length}\r\n\r\n${response}`);
         }
         else if (path.match(/\/files\/(.*)/) && path.match(/\/files\/(.*)/)[1] != '') {
-            let filePath = directory + path.match(/\/echo\/(.*)/)[1];
+            let filePath = directory + path.match(/\/files\/(.*)/)[1];
             console.log(filePath);
             try {
                 const file = fs.readFileSync(filePath);
