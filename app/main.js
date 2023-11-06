@@ -6,8 +6,14 @@ const server = net.createServer((socket) => {
     socket.end();
     server.close();
   });
-  socket.on("data", () => {
-    socket.write('HTTP/1.1 200 OK\r\n\r\n');
+  socket.on("data", (data) => {
+    let firstLine = data.toString().split('\r\n')[0];
+    if (firstLine.split(' ')[1].length === 1 && firstLine.split(' ')[1][0] === '/') {
+        socket.write('HTTP/1.1 200 OK\r\n\r\n');
+    }
+    else {
+        socket.write('HTTP/1.1 400 Not Found\r\n\r\n');
+    }
     socket.end();
   })
 });
