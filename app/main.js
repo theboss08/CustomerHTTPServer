@@ -8,12 +8,8 @@ const server = net.createServer((socket) => {
   });
   socket.on("data", (data) => {
     let firstLine = data.toString().split('\r\n')[0];
-    if (firstLine.split(' ')[1].length === 1 && firstLine.split(' ')[1][0] === '/') {
-        socket.write('HTTP/1.1 200 OK\r\n\r\n');
-    }
-    else {
-        socket.write('HTTP/1.1 404 Not Found\r\n\r\n');
-    }
+    let str = firstLine.split(' ')[1].match(/\/echo\/(.*)/);
+    socket.write(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${str[1].length}\r\n${str[1]}\r\n`);
     socket.end();
   })
 });
